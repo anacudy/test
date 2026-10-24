@@ -13,14 +13,26 @@ jobs:
         run: aria2c -i url.txt -d download -j 8 -x 8 -s 8 -k 1M
 
       - name: Install ADK
-        run: .\download\adksetup.exe /quiet /installpath "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit" /features OptionId.DeploymentTools
+        run: .\download\adksetup.exe /quiet
 
       - name: Install WinPE add-on
-        run: .\download\adkwinpesetup.exe /quiet /installpath "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit" /features OptionId.WindowsPreinstallationEnvironment
+        run: .\download\adkwinpesetup.exe /quiet
 
       - name: Build WinPE
-        shell: cmd
-        run: call "%ProgramFiles(x86)%\Windows Kits\10\Assessment and Deployment Kit\Windows Preinstallation Environment\copype.cmd" amd64 "%RUNNER_TEMP%\WinPE_amd64" && call "%ProgramFiles(x86)%\Windows Kits\10\Assessment and Deployment Kit\Windows Preinstallation Environment\MakeWinPEMedia.cmd" /ISO "%RUNNER_TEMP%\WinPE_amd64" "%RUNNER_TEMP%\WinPE_amd64.iso"
+        shell: pwsh
+        run: |
+          $adkPath = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\Assessment and Deployment Kit"
+          $copype = Get-ChildItem $adkPath -Filter copype.cmd -Recurse | Select-Object -First 1
+          $makeWinPEMedia = Get-ChildItem $adkPath -Filter MakeWinPEMedia.cmd -Recurse | Select-Object -First 1
+          if (!$copype -or !$makeWinPEMedia) { throw "WinPE build scripts not found under $adkPath." }
+          $workPath = Join-Path $env:RUNNER_TEMP "WinPE_amd64"
+          $isoPath = Join-Path $env:RUNNER_TEMP "WinPE_amd64.iso"
+
+          & $copype.FullName amd64 $workPath
+          if ($LASTEXITCODE -ne 0) { throw "copype failed with exit code $LASTEXITCODE." }
+
+          & $makeWinPEMedia.FullName /ISO $workPath $isoPath
+          if ($LASTEXITCODE -ne 0) { throw "MakeWinPEMedia failed with exit code $LASTEXITCODE." }
 
       - name: Upload WinPE
         uses: actions/upload-artifact@v4
