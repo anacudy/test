@@ -19,8 +19,8 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\DandISetEnv.bat"
-          copype amd64 D:\WinPE
-          MakeWinPEMedia /ISO D:\WinPE D:\WinPE.iso /bootex
+          call copype amd64 D:\WinPE
+          call MakeWinPEMedia /ISO D:\WinPE D:\WinPE.iso /bootex
 
       - name: Hash
         run: Get-FileHash D:\WinPE.iso SHA1
@@ -28,5 +28,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          path: C:\Windows\Logs\DISM
+          path: D:\WinPE.iso
           compression-level: 9
