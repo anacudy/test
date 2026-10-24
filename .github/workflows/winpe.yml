@@ -4,6 +4,8 @@ on:
 jobs:
   build:
     runs-on: windows-2025
+
     steps:
-      - uses: actions/checkout@7
+      - uses: actions/checkout@v7
+
       - run: ls
