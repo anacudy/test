@@ -14,21 +14,21 @@ jobs:
 
       - name: Install
         run: |
-          download/adksetup.exe /q /installpath d:/adk /features OptionId.DeploymentTools
-          download/adkwinpesetup.exe /q /installpath d:/adk
+          download/adksetup.exe /installpath D:/adk /l D:/adk/adksetup.log /features OptionId.DeploymentTools
+          download/adkwinpesetup.exe /installpath D:/adk /l D:/adk/adkwinpesetup.log
 
-      - name: Build
-        shell: cmd
-        run: |
-          call "D:/adk/Assessment and Deployment Kit/Deployment Tools/DandISetEnv.bat"
-          copype amd64 D:/WinPE
-          MakeWinPEMedia /ISO D:/WinPE D:/WinPE/WinPE.iso /bootex
+      # - name: Build
+      #   shell: cmd
+      #   run: |
+      #     call "D:/adk/Assessment and Deployment Kit/Deployment Tools/DandISetEnv.bat"
+      #     copype amd64 D:/WinPE
+      #     MakeWinPEMedia /ISO D:/WinPE D:/WinPE/WinPE.iso /bootex
 
-      - name: Hash
-        run: Get-FileHash D:/WinPE/WinPE.iso SHA1
+      # - name: Hash
+      #   run: Get-FileHash D:/WinPE/WinPE.iso SHA1
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          path: D:/WinPE/WinPE.iso
+          path: D:/adk
           compression-level: 9
