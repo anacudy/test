@@ -7,58 +7,20 @@ jobs:
     runs-on: windows-2025
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
 
       - name: Download ADK
-        shell: pwsh
-        run: |
-          $urls = @(Get-Content -Path "$env:GITHUB_WORKSPACE\url.txt" | Where-Object { $_.Trim() })
-          if ($urls.Count -ne 2) {
-            throw "Expected ADK and WinPE add-on URLs in url.txt."
-          }
-
-          $downloadPath = Join-Path $env:GITHUB_WORKSPACE "download"
-          New-Item -ItemType Directory -Path $downloadPath -Force | Out-Null
-          Invoke-WebRequest -Uri $urls[0] -OutFile (Join-Path $downloadPath "adksetup.exe")
-          Invoke-WebRequest -Uri $urls[1] -OutFile (Join-Path $downloadPath "adkwinpesetup.exe")
+        run: aria2c -i url.txt -d download -j 8 -x 8 -s 8 -k 1M
 
       - name: Install ADK
-        shell: pwsh
-        run: |
-          $adkPath = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\Assessment and Deployment Kit"
-          $installers = @(
-            @{
-              Path = Join-Path $env:GITHUB_WORKSPACE "download\adksetup.exe"
-              Feature = "OptionId.DeploymentTools"
-            },
-            @{
-              Path = Join-Path $env:GITHUB_WORKSPACE "download\adkwinpesetup.exe"
-              Feature = "OptionId.WindowsPreinstallationEnvironment"
-            }
-          )
+        run: .\download\adksetup.exe /quiet /installpath "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit" /features OptionId.DeploymentTools
 
-          foreach ($installer in $installers) {
-            $arguments = '/quiet /installpath "{0}" /features {1}' -f $adkPath, $installer.Feature
-            $process = Start-Process -FilePath $installer.Path -ArgumentList $arguments -Wait -PassThru
-            if ($process.ExitCode -notin @(0, 3010)) {
-              throw "$($installer.Path) failed with exit code $($process.ExitCode)."
-            }
-          }
+      - name: Install WinPE add-on
+        run: .\download\adkwinpesetup.exe /quiet /installpath "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit" /features OptionId.WindowsPreinstallationEnvironment
 
       - name: Build WinPE
-        shell: pwsh
-        run: |
-          $adkPath = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\Assessment and Deployment Kit"
-          $environmentScript = Join-Path $adkPath "Deployment Tools\DandISetEnv.bat"
-          $workPath = Join-Path $env:RUNNER_TEMP "WinPE_amd64"
-          $isoPath = Join-Path $env:RUNNER_TEMP "WinPE_amd64.iso"
-          $command = 'call "{0}" && copype amd64 "{1}" && MakeWinPEMedia /ISO "{1}" "{2}"' -f $environmentScript, $workPath, $isoPath
-
-          & cmd.exe /d /s /c $command
-          if ($LASTEXITCODE -ne 0) {
-            throw "WinPE ISO build failed with exit code $LASTEXITCODE."
-          }
+        shell: cmd
+        run: call "%ProgramFiles(x86)%\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\DandISetEnv.bat" && copype amd64 "%RUNNER_TEMP%\WinPE_amd64" && MakeWinPEMedia /ISO "%RUNNER_TEMP%\WinPE_amd64" "%RUNNER_TEMP%\WinPE_amd64.iso"
 
       - name: Upload WinPE
         uses: actions/upload-artifact@v4
