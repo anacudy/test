@@ -13,10 +13,10 @@ jobs:
         run: aria2c -i url.txt -d download -j 8 -x 8 -s 8 -k 1M
 
       - name: Install ADK
-        run: .\download\adksetup.exe /quiet
+        run: .\download\adksetup.exe /quiet /features OptionId.DeploymentTools
 
       - name: Install WinPE add-on
-        run: .\download\adkwinpesetup.exe /quiet
+        run: .\download\adkwinpesetup.exe /quiet /features OptionId.WindowsPreinstallationEnvironment
 
       - name: Build WinPE
         shell: pwsh
