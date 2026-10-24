@@ -9,27 +9,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Download
-        run: aria2c -i url.txt -d download -j 8 -x 8 -s 8 -k 1M
+      # - name: Download
+      #   run: aria2c -i url.txt -d download -j 8 -x 8 -s 8 -k 1M
 
       - name: Install
+        run: choco install -y windows-adk-deploy
+
+      - name: Build
+        shell: cmd
         run: |
-          # download/adksetup.exe /q /installpath D:/adk /l D:/adk/adksetup.log /features OptionId.DeploymentTools
-          # download/adkwinpesetup.exe /q /installpath D:/adk /l D:/adk/adkwinpesetup.log
-          choco install -y windows-adk-deploy windows-adk-winpe
+          call "C:/Program Files (x86)/Windows Kits/10/Assessment and Deployment Kit/Deployment Tools/DandISetEnv.bat"
+          copype amd64 D:/WinPE
+          MakeWinPEMedia /ISO D:/WinPE D:/WinPE/WinPE.iso /bootex
 
-      # - name: Build
-      #   shell: cmd
-      #   run: |
-      #     call "D:/adk/Assessment and Deployment Kit/Deployment Tools/DandISetEnv.bat"
-      #     copype amd64 D:/WinPE
-      #     MakeWinPEMedia /ISO D:/WinPE D:/WinPE/WinPE.iso /bootex
-
-      # - name: Hash
-      #   run: Get-FileHash D:/WinPE/WinPE.iso SHA1
+      - name: Hash
+        run: Get-FileHash D:/WinPE/WinPE.iso SHA1
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          path: D:/adk
+          path: D:/WinPE/WinPE.iso
           compression-level: 9
