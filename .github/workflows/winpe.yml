@@ -39,7 +39,7 @@ jobs:
           )
 
           foreach ($installer in $installers) {
-            $arguments = '/quiet /norestart /ceip off /features {0} /installpath "{1}"' -f $installer.Feature, $adkPath
+            $arguments = '/quiet /installpath "{0}" /features {1}' -f $adkPath, $installer.Feature
             $process = Start-Process -FilePath $installer.Path -ArgumentList $arguments -Wait -PassThru
             if ($process.ExitCode -notin @(0, 3010)) {
               throw "$($installer.Path) failed with exit code $($process.ExitCode)."
