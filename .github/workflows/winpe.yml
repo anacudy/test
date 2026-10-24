@@ -1,0 +1,11 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2025
+    steps:
+      - run: |
+          $PWD
+          $PSVersionTable
+          Get-Volume D
