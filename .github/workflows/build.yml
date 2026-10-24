@@ -22,8 +22,8 @@ jobs:
           call copype amd64 D:\WinPE
           call MakeWinPEMedia /ISO D:\WinPE D:\WinPE.iso /bootex
 
-      # - name: Hash
-      #   run: Get-FileHash D:\WinPE.iso SHA1
+      - name: Hash
+        run: Get-FileHash D:\WinPE.iso SHA1
 
       - name: Upload
         uses: actions/upload-artifact@v7
