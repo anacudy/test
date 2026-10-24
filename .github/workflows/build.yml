@@ -6,8 +6,8 @@ jobs:
     runs-on: windows-2025
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      # - name: Checkout
+      #   uses: actions/checkout@v7
 
       # - name: Download
       #   run: aria2c -i url.txt -d download -j 8 -x 8 -s 8 -k 1M
