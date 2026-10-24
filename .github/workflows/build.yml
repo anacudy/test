@@ -14,8 +14,9 @@ jobs:
 
       - name: Install
         run: |
-          download/adksetup.exe /q /installpath D:/adk /l D:/adk/adksetup.log /features OptionId.DeploymentTools
-          download/adkwinpesetup.exe /q /installpath D:/adk /l D:/adk/adkwinpesetup.log
+          # download/adksetup.exe /q /installpath D:/adk /l D:/adk/adksetup.log /features OptionId.DeploymentTools
+          # download/adkwinpesetup.exe /q /installpath D:/adk /l D:/adk/adkwinpesetup.log
+          choco install -y windows-adk-deploy windows-adk-winpe
 
       # - name: Build
       #   shell: cmd
