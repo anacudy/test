@@ -14,8 +14,8 @@ jobs:
 
       - name: Install
         run: |
-          download/adksetup.exe /installpath D:/adk /l D:/adk/adksetup.log /features OptionId.DeploymentTools
-          download/adkwinpesetup.exe /installpath D:/adk /l D:/adk/adkwinpesetup.log
+          download/adksetup.exe /q /installpath D:/adk /l D:/adk/adksetup.log /features OptionId.DeploymentTools
+          download/adkwinpesetup.exe /q /installpath D:/adk /l D:/adk/adkwinpesetup.log
 
       # - name: Build
       #   shell: cmd
