@@ -20,7 +20,7 @@ jobs:
 
       - name: Build WinPE
         shell: cmd
-        run: call "%ProgramFiles(x86)%\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\DandISetEnv.bat" && copype amd64 "%RUNNER_TEMP%\WinPE_amd64" && MakeWinPEMedia /ISO "%RUNNER_TEMP%\WinPE_amd64" "%RUNNER_TEMP%\WinPE_amd64.iso"
+        run: call "%ProgramFiles(x86)%\Windows Kits\10\Assessment and Deployment Kit\Windows Preinstallation Environment\copype.cmd" amd64 "%RUNNER_TEMP%\WinPE_amd64" && call "%ProgramFiles(x86)%\Windows Kits\10\Assessment and Deployment Kit\Windows Preinstallation Environment\MakeWinPEMedia.cmd" /ISO "%RUNNER_TEMP%\WinPE_amd64" "%RUNNER_TEMP%\WinPE_amd64.iso"
 
       - name: Upload WinPE
         uses: actions/upload-artifact@v4
